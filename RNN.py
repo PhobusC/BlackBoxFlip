@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 
 class RNN(nn.Module):
-    def __init__(self, d_in, d_out, n_layers=1, d_model=64):
+    def __init__(self, d_in, d_out, n_layers: int = 1, d_model: int | list =64):
         """
         d_model supports list for layers of different dimension or int for constant dim
         """
@@ -35,7 +35,7 @@ class RNN(nn.Module):
             # W_ih: list of connections from previous layers' hidden states
             # W_hh: list of connections from this layer's hidden state from past timestep
 
-            self.W_ih = nn.ModuleList([nn.linear(d_in, d_model)]
+            self.W_ih = nn.ModuleList([nn.Linear(d_in, d_model)]
                                         + [nn.Linear(d_model, d_model) for _ in range(1, n_layers)])
 
             self.W_hh = nn.ModuleList([nn.Linear(d_model, d_model) for _ in range(n_layers)])
@@ -53,7 +53,6 @@ class RNN(nn.Module):
     def forward(self, data, h_0=None):
         batch_size, n_obs, features = data.shape
 
-
         if h_0 is None:
             if type(self.hidden_size) == int:
                 h_0 = torch.zeros(self.n_layers, batch_size, self.hidden_size)
@@ -62,9 +61,23 @@ class RNN(nn.Module):
                 for size in self.hidden_size:
                     h_0.append(torch.zeros(batch_size, size))
 
+        # Iterate over the first dimension (n_layers)
+        prev_state = list(h_0) if type(self.hidden_size) == int else h_0 # Don't quite understand this?
+        preds = []
 
-        pred = []
+        for t in range(n_obs):
+            prev_out = data[:, t, :]
+            for i in range(self.n_layers):
+                output = self.activation(self.W_ih[i](prev_out) + self.W_hh[i](prev_state[i]))
+                prev_out = output
+                prev_state[i] = output
+
+            preds.append(self.output_layer(prev_out))
+
+        return torch.stack(preds, dim=1) # Change to torch tensor, apparently stack() is faster than tensor()
 
 
+# Random normal data:
+data = np.random.random(100)
+model = RNN(1, 1, n_layers=2)
 
-        return np.array(pred) # Change to torch tensor
