@@ -81,20 +81,3 @@ class FlipFlop2():
 
 
         return inp, out
-
-
-
-"""
-arr = np.random.binomial(1, 0.3, size=[20, 1])
-print(arr)
-print(np.where(arr != 0))
-"""
-
-flipTest = FlipFlop2()
-inp, out = flipTest.genData(30, 3, batch_size=3)
-print(inp.shape)
-for b in range(len(inp)):
-    for i, o in zip(inp[b], out[b]):
-        print(i, o)
-    
-    print('\n'*3)
