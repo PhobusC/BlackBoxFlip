@@ -1,4 +1,7 @@
-# This file is for a basic recurrent neural network
+"""
+This file is for a basic recurrent neural network
+Maybe can't use this because different goal
+"""
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -13,13 +16,14 @@ class RNN(nn.Module):
     d_model: either an int representing the dimension of the hidden layers,
         or a list of hidden layers
     """
-    def __init__(self, d_in, d_out, n_layers: int = 1, d_model: int | list =64):
+    def __init__(self, d_in, d_out, n_layers: int = 1, d_model: int | list = 64):
         """
         d_model supports list for layers of different dimension or int for constant dim
         """
         super().__init__()
         
         # TODO consider adding layer_norm
+        # TODO add r, J, J^F, w parameters for FORCE
 
         if isinstance(d_model, list) or isinstance(d_model, np.ndarray):
             if n_layers != len(d_model):
@@ -41,6 +45,8 @@ class RNN(nn.Module):
 
             self.output_layer = nn.Linear(last_dim, d_out)
 
+            self.n = None
+
             
         else:
             # W_ih: list of connections from previous layers' hidden states
@@ -53,13 +59,15 @@ class RNN(nn.Module):
             self.hidden_size = d_model
             self.output_layer = nn.Linear(d_model, d_out)
             
+            self.n = n
 
         self.n_layers = n_layers
 
         # self.activation = nn.ReLU()
         self.activation = nn.Tanh() # apparently better for RNN, prob bc vanishing gradient
 
-
+    def __len__(self):
+        return self.n
 
     def forward(self, data, h_0=None):
         batch_size, n_obs, features = data.shape
@@ -159,4 +167,4 @@ losses = train(model=model, data=data)
 
 plt.plot(losses)
 plt.show()
-"""
+""" 

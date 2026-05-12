@@ -15,3 +15,12 @@ d_model = 1000
 
 data = np.array([137, 134, 205, 19, 25, 26, 831, 108, 42.6])
 print(data.mean(), data.std())
+
+def main():
+    pass
+
+
+
+
+if __name__ == "main":
+    main()
