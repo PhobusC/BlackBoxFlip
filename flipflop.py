@@ -65,6 +65,9 @@ class FlipFlop2():
         unsigned_inp = np.random.binomial(1, p=p, size=[batch_size, n_steps, bits])  # Array of 0s and 1s, 1s with frequency p
         unsigned_out = 2 * np.random.binomial(1, p=0.5, size=[batch_size, n_steps, bits]) - 1  # Array of -1s and 1s, 50-50
 
+        unsigned_inp = unsigned_inp.astype(np.float32, copy=False)
+        unsigned_out = unsigned_out.astype(np.float32, copy=False)
+
         # This represents the signal to feed to the model
         inp = np.multiply(unsigned_inp, unsigned_out)  # Array of -1, 0, 1. -1/1 with frequency p, 0 with frequency 1-p
         inp[:, 0, :] = 1
